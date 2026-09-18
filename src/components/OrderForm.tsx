@@ -128,7 +128,6 @@ export function OrderForm() {
           id="fullName"
           type="text"
           autoComplete="name"
-          placeholder="مثال: زينب محمد"
           maxLength={100}
           disabled={isSubmitting}
           aria-invalid={Boolean(errors.fullName)}
@@ -144,7 +143,6 @@ export function OrderForm() {
           type="tel"
           inputMode="tel"
           autoComplete="tel"
-          placeholder="07XXXXXXXXX"
           maxLength={20}
           disabled={isSubmitting}
           aria-invalid={Boolean(errors.phone)}
@@ -185,7 +183,6 @@ export function OrderForm() {
         <input
           id="area"
           type="text"
-          placeholder="مثال: بغداد"
           maxLength={150}
           disabled={isSubmitting}
           aria-invalid={Boolean(errors.area)}
@@ -203,7 +200,6 @@ export function OrderForm() {
         <input
           id="landmark"
           type="text"
-          placeholder="مثال: قرب جامعة بابل"
           maxLength={200}
           disabled={isSubmitting}
           aria-invalid={Boolean(errors.landmark)}
@@ -232,7 +228,6 @@ export function OrderForm() {
             id="height"
             type="number"
             inputMode="numeric"
-            placeholder="165"
             min={100}
             max={230}
             disabled={isSubmitting}
@@ -253,7 +248,6 @@ export function OrderForm() {
             id="weight"
             type="number"
             inputMode="numeric"
-            placeholder="65"
             min={20}
             max={250}
             disabled={isSubmitting}
@@ -269,7 +263,6 @@ export function OrderForm() {
             id="size"
             type="text"
             // Letters and brand numbers are both valid, so this stays free text.
-            placeholder="L أو 42"
             maxLength={SIZE_MAX_LENGTH}
             autoComplete="off"
             disabled={isSubmitting}
@@ -290,7 +283,6 @@ export function OrderForm() {
         <textarea
           id="note"
           rows={3}
-          placeholder="أي تفاصيل إضافية تودين إخبارنا بها"
           maxLength={500}
           disabled={isSubmitting}
           aria-invalid={Boolean(errors.note)}

@@ -38,7 +38,6 @@ export function Field({ id, label, hint, error, children }: FieldProps) {
 export function controlClasses(hasError: boolean): string {
   return [
     "w-full rounded-lg border bg-white px-3 py-2.5 text-base text-neutral-900",
-    "placeholder:text-neutral-400",
     "outline-none transition-colors",
     "focus-visible:ring-2 focus-visible:ring-offset-1",
     hasError
