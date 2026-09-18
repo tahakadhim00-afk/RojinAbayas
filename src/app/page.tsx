@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { Footer } from "@/components/Footer";
 import { ImportantNotice } from "@/components/ImportantNotice";
 import { OrderForm } from "@/components/OrderForm";
 
@@ -31,6 +32,8 @@ export default function Home() {
       <div className="mt-7">
         <OrderForm />
       </div>
+
+      <Footer />
     </main>
   );
 }
