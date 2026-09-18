@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { ImportantNotice } from "@/components/ImportantNotice";
 import { OrderForm } from "@/components/OrderForm";
 
 export default function Home() {
@@ -23,7 +24,11 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mt-8">
+      <div className="mt-7">
+        <ImportantNotice />
+      </div>
+
+      <div className="mt-7">
         <OrderForm />
       </div>
     </main>
