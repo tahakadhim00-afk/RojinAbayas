@@ -9,7 +9,8 @@ const TIKTOK_HANDLE = "rojin__abaya";
 const WHATSAPP_DISPLAY = "+964 788 770 0111";
 const WHATSAPP_DIGITS = "9647887700111";
 
-const iconClasses = "h-5 w-5 shrink-0";
+/** Larger than the form's icons: here the icon is what identifies the link. */
+const iconClasses = "h-6 w-6 shrink-0";
 
 function InstagramIcon() {
   return (
@@ -38,7 +39,10 @@ function WhatsAppIcon() {
   );
 }
 
-/** One contact row: icon, platform name, and the handle in LTR. */
+/**
+ * One contact: icon above the handle. `label` is not rendered — it names the
+ * platform for screen readers, which the icon alone cannot do.
+ */
 function ContactLink({
   href,
   icon,
@@ -55,12 +59,13 @@ function ContactLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      // min-h-11 (44px) keeps the tap target comfortable on a phone.
-      className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/30"
+      aria-label={`${label}: ${value}`}
+      className="flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/30"
     >
       {icon}
-      <span className="text-sm font-medium">{label}</span>
-      <span dir="ltr" className="mr-auto text-sm text-neutral-500">
+      {/* whitespace-nowrap: the phone number must never wrap or truncate —
+          a half-shown number is useless to the customer. */}
+      <span dir="ltr" className="whitespace-nowrap text-xs text-neutral-500">
         {value}
       </span>
     </a>
@@ -74,7 +79,7 @@ export function Footer() {
         تابعينا أو تواصلي معنا
       </p>
 
-      <nav aria-label="روابط التواصل" className="flex flex-col gap-0.5">
+      <nav aria-label="روابط التواصل" className="flex items-start justify-center gap-1">
         <ContactLink
           href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
           icon={<InstagramIcon />}

@@ -330,7 +330,7 @@ export function OrderForm() {
       </button>
 
       <p className="text-center text-xs leading-relaxed text-neutral-500">
-        معلوماتك تُستخدم لمعالجة طلبك فقط، وسيتم التواصل معك هاتفيًا للتأكيد.
+        معلوماتك تُستخدم لمعالجة طلبك فقط، وسيتم التواصل معك على الواتساب لتأكيد الطلب 
       </p>
     </form>
   );
