@@ -76,8 +76,12 @@ public/
 - **Customer text is HTML-escaped** before being placed in the Telegram message,
   which uses HTML parse mode. Don't switch to Markdown parse mode without
   changing the escaping in `src/lib/telegram.ts` to match.
-- **Adding a governorate or size** means editing `src/lib/constants.ts` only; the
-  dropdowns and the validation both read from there.
+- **Adding a governorate** means editing `src/lib/constants.ts` only; the dropdown
+  and the validation both read from there.
+- **Size is free text, not a dropdown.** Rojin uses brand-specific numeric sizes
+  (42, 46) alongside letter sizes (L, XL), so an enum would reject legitimate
+  values. It is bounded by length (`SIZE_MAX_LENGTH`) and still required, and
+  Arabic-Indic digits are normalized so "٤٢" reaches Telegram as "42".
 - **The note field is optional and normalizes to `undefined`.** Empty and
   whitespace-only values are dropped by the schema, and the Telegram message
   omits the whole 📝 section rather than showing an empty heading.

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
-import { GOVERNORATES, SIZES } from "@/lib/constants";
+import { GOVERNORATES, SIZE_MAX_LENGTH } from "@/lib/constants";
 import { orderSchema, type Order, type OrderFormValues } from "@/lib/schema";
 import { Field, controlClasses } from "./Field";
 import { SuccessState } from "./SuccessState";
@@ -185,7 +185,7 @@ export function OrderForm() {
         <input
           id="area"
           type="text"
-          placeholder="مثال: الحلة"
+          placeholder="مثال: بغداد"
           maxLength={150}
           disabled={isSubmitting}
           aria-invalid={Boolean(errors.area)}
@@ -265,24 +265,19 @@ export function OrderForm() {
         </Field>
 
         <Field id="size" label="القياس" error={errors.size?.message}>
-          <select
+          <input
             id="size"
+            type="text"
+            // Letters and brand numbers are both valid, so this stays free text.
+            placeholder="L أو 42"
+            maxLength={SIZE_MAX_LENGTH}
+            autoComplete="off"
             disabled={isSubmitting}
-            defaultValue=""
             aria-invalid={Boolean(errors.size)}
             aria-describedby={errors.size ? "size-error" : undefined}
             className={controlClasses(Boolean(errors.size))}
             {...register("size")}
-          >
-            <option value="" disabled>
-              اختاري
-            </option>
-            {SIZES.map((size) => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
+          />
         </Field>
       </div>
 

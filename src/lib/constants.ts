@@ -22,10 +22,12 @@ export const GOVERNORATES = [
 
 export type Governorate = (typeof GOVERNORATES)[number];
 
-/** Abaya sizes offered in the order form (PRD §15). */
-export const SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
-
-export type Size = (typeof SIZES)[number];
+/**
+ * Size is free text rather than a fixed list: Rojin uses numeric sizes
+ * alongside the usual letters, and the numbering is brand-specific, so an
+ * enum would reject legitimate values. Bounded by length only.
+ */
+export const SIZE_MAX_LENGTH = 20;
 
 /** Validation safeguards, not sizing recommendations (PRD §19). */
 export const HEIGHT_MIN_CM = 100;

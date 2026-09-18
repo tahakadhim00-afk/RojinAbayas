@@ -4,7 +4,7 @@ import {
   GOVERNORATES,
   HEIGHT_MAX_CM,
   HEIGHT_MIN_CM,
-  SIZES,
+  SIZE_MAX_LENGTH,
   WEIGHT_MAX_KG,
   WEIGHT_MIN_KG,
 } from "./constants";
@@ -105,7 +105,20 @@ export const orderSchema = z.object({
     `${WEIGHT_MIN_KG}-${WEIGHT_MAX_KG} كغم`,
   ),
 
-  size: z.enum(SIZES, { message: "يرجى اختيار القياس" }),
+  /**
+   * Free text: letter sizes (L, XL) and brand-specific numbers (42, 46) are
+   * both valid, so this is bounded by length rather than matched to a list.
+   * Arabic-Indic digits are normalized so "٤٢" reaches the store as "42".
+   */
+  size: z
+    .string({ message: "القياس مطلوب" })
+    .transform((value) => toAsciiDigits(value).trim())
+    .pipe(
+      z
+        .string()
+        .min(1, "يرجى كتابة القياس")
+        .max(SIZE_MAX_LENGTH, "القياس طويل جدًا"),
+    ),
 
   /**
    * Optional free-text note. Empty and whitespace-only values normalize to
@@ -127,16 +140,15 @@ export const orderSchema = z.object({
 });
 
 /**
- * Values as the form holds them while being filled in. The two selects start
- * empty, so their draft type widens to include `""` — that state is invalid
- * on submit but must be representable while the customer is still choosing.
+ * Values as the form holds them while being filled in. The governorate select
+ * starts empty, so its draft type widens to include `""` — that state is
+ * invalid on submit but must be representable while the customer is choosing.
  */
 export type OrderFormValues = Omit<
   z.input<typeof orderSchema>,
-  "governorate" | "size"
+  "governorate"
 > & {
   governorate: z.input<typeof orderSchema>["governorate"] | "";
-  size: z.input<typeof orderSchema>["size"] | "";
 };
 
 /** Values after validation: phone normalized, measurements numeric. */
