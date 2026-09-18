@@ -85,6 +85,20 @@ public/
 - **The note field is optional and normalizes to `undefined`.** Empty and
   whitespace-only values are dropped by the schema, and the Telegram message
   omits the whole 📝 section rather than showing an empty heading.
+- **TikTok Pixel is off unless `NEXT_PUBLIC_TIKTOK_PIXEL_ID` is set.** With it
+  unset nothing is injected and no request reaches TikTok, so local and preview
+  runs never pollute production data. It is inlined at build time, so changing
+  it in Vercel needs a redeploy.
+- **Only genuine orders count as conversions.** The API answers the honeypot
+  with `200` + `tracked: false` and a real order with `201` + `tracked: true`;
+  the client requires both before firing `SubmitForm`, so bot submissions never
+  inflate ad numbers.
+- **Tracking can never break the form.** Every call in `src/lib/tiktok.ts` is a
+  no-op when the pixel is absent (ad blocker, unset id, SSR) and is
+  `try/catch`-wrapped. Verified: orders still succeed with the pixel blocked.
+- **Early events wait for the pixel.** The snippet loads `afterInteractive`, so
+  it is not on the page when the first React effect runs; `whenReady` polls
+  briefly rather than dropping that event.
 
 ## Scripts
 

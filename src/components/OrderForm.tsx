@@ -6,10 +6,22 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 import { GOVERNORATES, SIZE_MAX_LENGTH } from "@/lib/constants";
 import { orderSchema, type Order, type OrderFormValues } from "@/lib/schema";
+import {
+  createEventId,
+  tiktokIdentify,
+  tiktokTrack,
+  toE164Iraqi,
+} from "@/lib/tiktok";
 import { Field, controlClasses } from "./Field";
 import { SuccessState } from "./SuccessState";
 
 type Status = "idle" | "submitting" | "error";
+
+/** Shared across the TikTok events so they report as one funnel. */
+const TIKTOK_CONTENT = {
+  content_type: "product",
+  content_id: "rojin-abaya-order",
+} as const;
 
 export function OrderForm() {
   const [status, setStatus] = useState<Status>("idle");
@@ -18,6 +30,12 @@ export function OrderForm() {
   const errorRef = useRef<HTMLDivElement>(null);
   /** Synchronous in-flight flag; see the guard in `submitOrder`. */
   const inFlightRef = useRef(false);
+  /**
+   * Fire-once guards for the analytics events. Refs survive React StrictMode's
+   * double-invoked effects in development, so events are not counted twice.
+   */
+  const viewTrackedRef = useRef(false);
+  const startTrackedRef = useRef(false);
 
   const {
     register,
@@ -49,9 +67,36 @@ export function OrderForm() {
     if (status === "error") errorRef.current?.focus();
   }, [status, errorMessage]);
 
+  // The customer reached the order form. Fired here rather than in the layout
+  // so it means "saw the form", not merely "loaded some page".
+  useEffect(() => {
+    if (viewTrackedRef.current) return;
+    viewTrackedRef.current = true;
+    tiktokTrack("ViewContent", {
+      event_id: createEventId(),
+      ...TIKTOK_CONTENT,
+      content_name: "إتمام الطلب",
+    });
+  }, []);
+
   /** Re-arms the form when validation fails, so the customer can correct and retry. */
   const releaseGuard = useCallback(() => {
     inFlightRef.current = false;
+  }, []);
+
+  /**
+   * The customer started filling the form, rather than just landing on it.
+   * Delegated from the form element so no field's `register()` spread has to
+   * be touched.
+   */
+  const handleFormStart = useCallback(() => {
+    if (startTrackedRef.current) return;
+    startTrackedRef.current = true;
+    tiktokTrack("ClickButton", {
+      event_id: createEventId(),
+      ...TIKTOK_CONTENT,
+      content_name: "بدء تعبئة النموذج",
+    });
   }, []);
 
   const submitOrder = useCallback(async (values: Order) => {
@@ -69,12 +114,33 @@ export function OrderForm() {
         | {
             ok?: boolean;
             orderId?: string;
+            tracked?: boolean;
             error?: string;
             fieldErrors?: Record<string, string>;
           }
         | null;
 
       if (response.ok && data?.ok) {
+        // Report the conversion only for orders that actually reached Telegram.
+        // The honeypot answers bots with a fake success (200 + tracked:false),
+        // so both checks must pass before anything is counted.
+        if (response.status === 201 && data.tracked === true) {
+          // Plaintext by design: the pixel hashes these with SHA-256 in the
+          // browser, so nothing identifying leaves the device in the clear.
+          tiktokIdentify({
+            phone_number: toE164Iraqi(values.phone),
+            external_id: data.orderId,
+          });
+
+          // The order id doubles as the event id, so a repeated fire for the
+          // same order collapses into one conversion on TikTok's side.
+          tiktokTrack("SubmitForm", {
+            event_id: data.orderId ?? createEventId(),
+            ...TIKTOK_CONTENT,
+            content_name: "طلب عباية",
+          });
+        }
+
         setOrderId(data.orderId ?? null);
         return;
       }
@@ -109,6 +175,9 @@ export function OrderForm() {
 
   return (
     <form
+      // Catches the first focus of any field in one place, so every field's
+      // react-hook-form wiring stays untouched.
+      onFocusCapture={handleFormStart}
       onSubmit={(event) => {
         // Claimed here, before validation, not inside the validated callback:
         // handleSubmit validates asynchronously, so a second click would
@@ -329,8 +398,12 @@ export function OrderForm() {
         {isSubmitting ? "جارٍ إرسال الطلب..." : "إتمام الطلب"}
       </button>
 
+      {/* "فقط" was dropped: a hashed phone now also goes to our advertising
+          measurement tools, which is a second purpose the old wording denied. */}
       <p className="text-center text-xs leading-relaxed text-neutral-500">
-        معلوماتك تُستخدم لمعالجة طلبك فقط، وسيتم التواصل معك على الواتساب لتأكيد الطلب.
+        معلوماتك تُستخدم لمعالجة طلبك، وسيتم التواصل معك على الواتساب لتأكيد
+        الطلب. نستخدم أدوات قياس لتحسين إعلاناتنا دون مشاركة معلوماتك بصيغتها
+        الظاهرة.
       </p>
     </form>
   );

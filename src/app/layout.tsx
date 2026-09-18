@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
+import { TikTokPixel } from "@/components/TikTokPixel";
 import "./globals.css";
 
 /**
@@ -35,7 +36,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ar" dir="rtl" className={thmanyah.variable}>
-      <body className="bg-white text-neutral-900 antialiased">{children}</body>
+      <body className="bg-white text-neutral-900 antialiased">
+        {children}
+        <TikTokPixel />
+      </body>
     </html>
   );
 }

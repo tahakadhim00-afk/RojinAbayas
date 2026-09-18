@@ -67,9 +67,14 @@ export async function POST(request: Request) {
 
   // Honeypot: a filled hidden field means an automated submission. Respond as
   // if it succeeded so bots get no signal, but send nothing to Telegram.
+  //
+  // `tracked: false` tells the browser not to count this as a conversion, so
+  // bot submissions never inflate ad analytics. It reveals only that an
+  // analytics event was skipped — not that the order was discarded — and most
+  // bots run no JavaScript and never read it at all.
   if (order.website) {
     return NextResponse.json(
-      { ok: true, orderId: generateOrderId() },
+      { ok: true, orderId: generateOrderId(), tracked: false },
       { status: 200 },
     );
   }
@@ -87,5 +92,7 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true, orderId }, { status: 201 });
+  // `tracked: true` marks this as a real order that reached Telegram — the
+  // only case the client should report as a conversion.
+  return NextResponse.json({ ok: true, orderId, tracked: true }, { status: 201 });
 }
