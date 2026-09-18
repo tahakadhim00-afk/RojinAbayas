@@ -21,37 +21,44 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-/** Formats a validated order into the readable Telegram message (PRD §25). */
+/**
+ * Formats a validated order into the Telegram message (PRD §25).
+ *
+ * Laid out for how the store reads it on a phone: label and value share a
+ * line, and fields are grouped by what they are used for — who to contact,
+ * where to deliver, what to send — so the whole order fits on one screen.
+ */
 export function formatOrderMessage(order: Order, orderId: string): string {
-  const divider = "━━━━━━━━━━━━━━━━";
+  const divider = "──────────────";
   const e = escapeHtml;
 
+  /** `<code>` keeps the value selectable and copy-tappable in Telegram. */
+  const row = (label: string, value: string) =>
+    `<b>${label}:</b> ${value}`;
+
   return [
-    "🛍️ <b>طلب جديد - عبايات روجين</b>",
-    "",
+    "<b>طلب جديد — عبايات روجين</b>",
+    `<code>${e(orderId)}</code>`,
     divider,
     "",
-    `👤 <b>الاسم:</b>\n${e(order.fullName)}`,
+    "<b>الزبونة</b>",
+    row("الاسم", e(order.fullName)),
+    // Kept bare (no <code>) so Telegram linkifies it into a tap-to-call link.
+    row("الهاتف", e(order.phone)),
     "",
-    `📱 <b>رقم الهاتف:</b>\n${e(order.phone)}`,
+    "<b>التوصيل</b>",
+    row("المحافظة", e(order.governorate)),
+    row("المنطقة", e(order.area)),
+    row("أقرب نقطة", e(order.landmark)),
     "",
-    `📍 <b>المحافظة:</b>\n${e(order.governorate)}`,
-    "",
-    `🏘️ <b>المنطقة:</b>\n${e(order.area)}`,
-    "",
-    `📌 <b>أقرب نقطة دالة:</b>\n${e(order.landmark)}`,
-    "",
-    `📏 <b>الطول:</b>\n${order.height} cm`,
-    "",
-    `⚖️ <b>الوزن:</b>\n${order.weight} kg`,
-    "",
-    `👗 <b>القياس:</b>\n${e(order.size)}`,
+    "<b>القياسات</b>",
+    row("الطول", `${order.height} سم`),
+    row("الوزن", `${order.weight} كغم`),
+    row("القياس", e(order.size)),
     // Only present when the customer wrote one, so the message stays compact.
-    ...(order.note ? ["", `📝 <b>ملاحظة:</b>\n${e(order.note)}`] : []),
-    "",
-    divider,
-    "",
-    `🆔 <b>رقم الطلب:</b>\n<code>${e(orderId)}</code>`,
+    ...(order.note
+      ? ["", "<b>ملاحظة</b>", e(order.note)]
+      : []),
   ].join("\n");
 }
 
