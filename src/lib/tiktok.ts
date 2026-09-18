@@ -33,8 +33,21 @@ declare global {
   }
 }
 
-/** Empty unless configured, which disables the whole integration. */
-export const TIKTOK_PIXEL_ID = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ?? "";
+/**
+ * The store's live pixel. Not a secret — it ships to every visitor's browser —
+ * so it is committed as the default and the site tracks the moment it deploys.
+ * `NEXT_PUBLIC_TIKTOK_PIXEL_ID` overrides it if the pixel is ever replaced.
+ */
+const DEFAULT_PIXEL_ID = "DAMJJCBC77UFS4KR3R90";
+
+/**
+ * Production only. Without this guard `npm run dev` would fire real events into
+ * the live pixel, polluting conversion data with test submissions. Set
+ * NEXT_PUBLIC_TIKTOK_PIXEL_ID locally to deliberately test the pixel.
+ */
+export const TIKTOK_PIXEL_ID =
+  process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ??
+  (process.env.NODE_ENV === "production" ? DEFAULT_PIXEL_ID : "");
 
 /**
  * Returns the pixel only when it is genuinely usable: in the browser, loaded,
