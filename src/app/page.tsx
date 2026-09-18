@@ -1,39 +1,29 @@
-import Image from "next/image";
-
-import { Footer } from "@/components/Footer";
 import { ImportantNotice } from "@/components/ImportantNotice";
 import { OrderForm } from "@/components/OrderForm";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-[540px] flex-col px-5 py-10 sm:py-14">
-      <header className="flex flex-col items-center gap-5 text-center">
-        <Image
-          src="/logo.png"
-          alt="عبايات روجين"
-          width={746}
-          height={321}
-          priority
-          className="h-auto w-40"
-        />
+    <>
+      <SiteHeader />
 
-        <div className="flex flex-col gap-2">
+      <main className="mx-auto flex w-full max-w-[540px] flex-col px-5 py-8 sm:py-10">
+        {/* The logo lives in the header now, so the page opens on the title. */}
+        <div className="flex flex-col gap-2 text-center">
           <h1 className="text-2xl font-bold text-neutral-900">إتمام الطلب</h1>
           <p className="text-sm leading-relaxed text-neutral-500">
             يرجى إدخال معلوماتك بشكل صحيح ليصلك طلبك دون تأخير.
           </p>
         </div>
-      </header>
 
-      <div className="mt-7">
-        <ImportantNotice />
-      </div>
+        <div className="mt-7">
+          <ImportantNotice />
+        </div>
 
-      <div className="mt-7">
-        <OrderForm />
-      </div>
-
-      <Footer />
-    </main>
+        <div className="mt-7">
+          <OrderForm />
+        </div>
+      </main>
+    </>
   );
 }

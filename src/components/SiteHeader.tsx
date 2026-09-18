@@ -1,6 +1,10 @@
+import Image from "next/image";
+
 /**
- * Store contact links. Handles are shown LTR so Arabic RTL layout does not
- * reorder the latin usernames or the phone number.
+ * Site header: brand logo on one side, social links on the other.
+ *
+ * In an RTL document `justify-between` places the first child on the right,
+ * so the logo sits right and the links left, as the page reads.
  */
 
 const INSTAGRAM_HANDLE = "rojin.abaya";
@@ -9,8 +13,7 @@ const TIKTOK_HANDLE = "rojin__abaya";
 const WHATSAPP_DISPLAY = "+964 788 770 0111";
 const WHATSAPP_DIGITS = "9647887700111";
 
-/** Larger than the form's icons: here the icon is what identifies the link. */
-const iconClasses = "h-6 w-6 shrink-0";
+const iconClasses = "h-5 w-5";
 
 function InstagramIcon() {
   return (
@@ -40,70 +43,65 @@ function WhatsAppIcon() {
 }
 
 /**
- * One contact: icon above the handle. `label` is not rendered — it names the
- * platform for screen readers, which the icon alone cannot do.
+ * Icon-only link. The handle does not fit in a compact header, so the platform
+ * and handle live in aria-label and the tooltip instead of on screen.
  */
-function ContactLink({
+function SocialLink({
   href,
   icon,
   label,
-  value,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
-  value: string;
 }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${label}: ${value}`}
-      className="flex flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/30"
+      aria-label={label}
+      title={label}
+      // 40px square: comfortable to tap without making the header tall.
+      className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900/30"
     >
       {icon}
-      {/* whitespace-nowrap: the phone number must never wrap or truncate —
-          a half-shown number is useless to the customer. */}
-      <span dir="ltr" className="whitespace-nowrap text-xs text-neutral-500">
-        {value}
-      </span>
     </a>
   );
 }
 
-export function Footer() {
+export function SiteHeader() {
   return (
-    <footer className="mt-10 border-t border-neutral-200 pt-6">
-      <p className="mb-2 text-center text-sm text-neutral-500">
-        تابعينا أو تواصلي معنا
-      </p>
+    <header className="border-b border-neutral-200">
+      <div className="mx-auto flex w-full max-w-[540px] items-center justify-between gap-4 px-5 py-3">
+        <Image
+          src="/logo.png"
+          alt="عبايات روجين"
+          width={746}
+          height={321}
+          priority
+          className="h-9 w-auto"
+        />
 
-      <nav aria-label="روابط التواصل" className="flex items-start justify-center gap-1">
-        <ContactLink
-          href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
-          icon={<InstagramIcon />}
-          label="انستغرام"
-          value={`@${INSTAGRAM_HANDLE}`}
-        />
-        <ContactLink
-          href={`https://tiktok.com/@${TIKTOK_HANDLE}`}
-          icon={<TikTokIcon />}
-          label="تيك توك"
-          value={`@${TIKTOK_HANDLE}`}
-        />
-        <ContactLink
-          // wa.me requires digits only — no "+", spaces or dashes.
-          href={`https://wa.me/${WHATSAPP_DIGITS}`}
-          icon={<WhatsAppIcon />}
-          label="واتساب"
-          value={WHATSAPP_DISPLAY}
-        />
-      </nav>
-
-      <p className="mt-5 text-center text-xs text-neutral-400">
-        عبايات روجين
-      </p>
-    </footer>
+        <nav aria-label="روابط التواصل" className="flex items-center gap-0.5">
+          <SocialLink
+            href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
+            icon={<InstagramIcon />}
+            label={`انستغرام: @${INSTAGRAM_HANDLE}`}
+          />
+          <SocialLink
+            href={`https://tiktok.com/@${TIKTOK_HANDLE}`}
+            icon={<TikTokIcon />}
+            label={`تيك توك: @${TIKTOK_HANDLE}`}
+          />
+          <SocialLink
+            // wa.me requires digits only — no "+", spaces or dashes.
+            href={`https://wa.me/${WHATSAPP_DIGITS}`}
+            icon={<WhatsAppIcon />}
+            label={`واتساب: ${WHATSAPP_DISPLAY}`}
+          />
+        </nav>
+      </div>
+    </header>
   );
 }
