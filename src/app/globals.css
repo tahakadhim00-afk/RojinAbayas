@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette derived from the Rojin logo: black field, gold lettering. */
+  --color-brand: #0a0a0a;
+  --color-brand-gold: #c9a227;
+
+  --font-sans: var(--font-thmanyah), system-ui, sans-serif;
+}
+
+html {
+  /* The form is short; reserving the scrollbar avoids a horizontal jump. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: var(--font-sans);
+  /* Never allow a stray wide element to cause horizontal scrolling (PRD §16). */
+  overflow-x: hidden;
+}
+
+/* Remove the spinner arrows on number inputs: they crowd the compact
+   height/weight fields and invite mis-clicks on mobile. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
